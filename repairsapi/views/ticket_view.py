@@ -62,6 +62,23 @@ class TicketView(ViewSet):
             service_ticket, context={'request': request})
         return Response(serialized.data, status=status.HTTP_200_OK)
 
+    def update(self, request, pk=None):
+        """Handle PUT Requests for a single customer
+        Returns:
+            Response -- No response body. just 204 status code.
+        """
+        # select targeted ticket
+        ticket = ServiceTicket.objects.get(pk=pk)
+        # get employee id from client request
+        employee_id = request.data['employee']
+        # select the employee from the database using id
+        assigned_employee = Employee.objects.get(pk=employee_id)
+        # assign employee instance to the employee property of the ticket
+        ticket.employee = assigned_employee
+        ticket.save()
+
+        return Response(None, status=status.HTTP_204_NO_CONTENT)
+
 
 class TicketEmployeeSerializer(serializers.ModelSerializer):
     """JSON serializer for tickets"""
